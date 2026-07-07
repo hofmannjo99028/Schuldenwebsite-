@@ -244,6 +244,28 @@ function summe(containerId){
 
 let gesamt = 0;
 
+const container =
+document.getElementById(containerId);
+
+const alleInputs =
+container.getElementsByTagName("input");
+
+for(let i = 0; i < alleInputs.length; i++){
+
+    let wert = parseFloat(
+        alleInputs[i].value.replace(",", ".")
+    );
+
+    if(!isNaN(wert)){
+        gesamt += wert;
+    }
+
+}
+
+return gesamt;
+
+}
+
 document
 .querySelectorAll("#" + containerId + " input[type='number']")
 .forEach(feld => {
