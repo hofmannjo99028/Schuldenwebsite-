@@ -6,7 +6,6 @@
 <title>Klarblick Finanzen</title>
 
 <style>
-
 body{
     margin:0;
     font-family:Arial,sans-serif;
@@ -17,29 +16,21 @@ body{
     background:linear-gradient(135deg,#3767d8,#61b6a8);
     color:white;
     text-align:center;
-    padding:80px 20px;
-}
-
-.hero h1{
-    font-size:60px;
+    padding:70px 20px;
 }
 
 .container{
-    max-width:1100px;
+    max-width:1000px;
     margin:auto;
-    padding:30px;
+    padding:25px;
 }
 
 .card{
     background:white;
+    padding:25px;
     border-radius:20px;
-    padding:30px;
-    margin-bottom:25px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.08);
-}
-
-h2{
-    color:#3767d8;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.1);
 }
 
 input{
@@ -68,12 +59,20 @@ input{
 }
 
 button{
-    background:#3767d8;
-    color:white;
     border:none;
     border-radius:10px;
-    padding:12px 18px;
+    padding:12px 16px;
     cursor:pointer;
+    background:#3767d8;
+    color:white;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.loeschen{
+    background:#d9534f;
 }
 
 .button-row{
@@ -82,34 +81,29 @@ button{
     flex-wrap:wrap;
 }
 
-.loeschen{
-    background:#d9534f;
-}
-
 .ergebnis{
     background:#e8f7ef;
     border-radius:15px;
     padding:20px;
-    margin-top:20px;
 }
 
-.geld{
-    font-size:42px;
+.gruen{
     color:#2ca36a;
+    font-size:40px;
     font-weight:bold;
 }
 
-.negativ{
+.rot{
     color:#d9534f;
+    font-size:40px;
+    font-weight:bold;
 }
-
 </style>
 </head>
 
 <body>
 
 <section class="hero">
-
 <h1>Klarblick Finanzen</h1>
 
 <p>
@@ -117,7 +111,6 @@ Schulden können jeden treffen.
 Du musst dich nicht schämen.
 Der erste Schritt ist Überblick.
 </p>
-
 </section>
 
 <div class="container">
@@ -128,8 +121,8 @@ Der erste Schritt ist Überblick.
 
 <input
 class="einkommen"
-type="number"
 id="einkommen"
+type="number"
 placeholder="z.B. 2400">
 
 </div>
@@ -140,21 +133,33 @@ placeholder="z.B. 2400">
 
 <div id="ausgaben"></div>
 
-<div class="button-row">
-
 <button onclick="neueAusgabe()">
 + Ausgabe hinzufügen
 </button>
 
 </div>
 
-</div>
-
 <div class="card">
+
+<div class="button-row">
 
 <button onclick="berechnen()">
 Budget berechnen
 </button>
+
+<button onclick="speichern()">
+💾 Speichern
+</button>
+
+<button onclick="laden()">
+📂 Laden
+</button>
+
+<button onclick="allesLoeschen()">
+🗑 Löschen
+</button>
+
+</div>
 
 <div id="ergebnis"></div>
 
@@ -166,33 +171,18 @@ Budget berechnen
 
 function neueAusgabe(){
 
-const container =
-document.getElementById("ausgaben");
+const div = document.createElement("div");
 
-const zeile =
-document.createElement("div");
+div.className = "zeile";
 
-zeile.className = "zeile";
-
-zeile.innerHTML = `
-<input
-class="name"
-placeholder="z.B. Miete, Netflix, Kredit, Versicherung">
-
-<input
-class="betrag"
-type="number"
-step="0.01"
-placeholder="Betrag">
-
-<button
-class="loeschen"
-onclick="this.parentElement.remove()">
-🗑
-</button>
+div.innerHTML = `
+<input class="name" placeholder="z.B. Miete, Kredit, Netflix">
+<input class="betrag" type="number" step="0.01" placeholder="Betrag">
+<button class="loeschen" onclick="this.parentElement.remove()">🗑</button>
 `;
 
-container.appendChild(zeile);
+document.getElementById("ausgaben")
+.appendChild(div);
 
 }
 
@@ -217,10 +207,8 @@ parseFloat(feld.value) || 0;
 let verfuegbar =
 einkommen - ausgaben;
 
-let farbe =
-verfuegbar >= 0
-? "geld"
-: "geld negativ";
+let klasse =
+verfuegbar >= 0 ? "gruen" : "rot";
 
 document.getElementById("ergebnis").innerHTML = `
 
@@ -238,30 +226,113 @@ ${ausgaben.toFixed(2)} €</p>
 
 <p>Monatlich verfügbar:</p>
 
-<div class="${farbe}">
+<div class="${klasse}">
 ${verfuegbar.toFixed(2)} €
 </div>
 
 <p>
-Du hast den wichtigsten Schritt bereits geschafft:
+Du hast den wichtigsten Schritt geschafft:
 Du kennst deine Zahlen.
 </p>
 
-<p>
-In 12 Monaten entspräche das:
-<strong>${(verfuegbar*12).toFixed(2)} €</strong>
-</p>
-
 </div>
-
 `;
 
 }
 
+function speichern(){
+
+const daten = {
+
+einkommen:
+document.getElementById("einkommen").value,
+
+ausgaben:[]
+};
+
+document
+.querySelectorAll(".zeile")
+.forEach(zeile=>{
+
+daten.ausgaben.push({
+
+name:
+zeile.querySelector(".name").value,
+
+betrag:
+zeile.querySelector(".betrag").value
+
+});
+
+});
+
+localStorage.setItem(
+"klarblickDaten",
+JSON.stringify(daten)
+);
+
+alert("Daten gespeichert");
+}
+
+function laden(){
+
+const daten =
+JSON.parse(
+localStorage.getItem("klarblickDaten")
+);
+
+if(!daten){
+return;
+}
+
+document.getElementById("einkommen").value =
+daten.einkommen;
+
+document.getElementById("ausgaben").innerHTML = "";
+
+daten.ausgaben.forEach(eintrag=>{
+
 neueAusgabe();
+
+const zeilen =
+document.querySelectorAll(".zeile");
+
+const letzte =
+zeilen[zeilen.length-1];
+
+letzte.querySelector(".name").value =
+eintrag.name;
+
+letzte.querySelector(".betrag").value =
+eintrag.betrag;
+
+});
+
+}
+
+function allesLoeschen(){
+
+localStorage.removeItem("klarblickDaten");
+
+document.getElementById("einkommen").value="";
+
+document.getElementById("ausgaben").innerHTML="";
+
+document.getElementById("ergebnis").innerHTML="";
+
+neueAusgabe();
+
+alert("Daten gelöscht");
+}
+
+laden();
+
+if(document.querySelectorAll(".zeile").length===0){
+neueAusgabe();
+}
 
 </script>
 
 </body>
-</html></body>
 </html>
+`
