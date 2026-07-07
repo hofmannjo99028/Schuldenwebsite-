@@ -156,6 +156,18 @@ placeholder="z.B. 2400">
 Budget berechnen
 </button>
 
+<button onclick="speichern()">
+💾 Daten speichern
+</button>
+
+<button onclick="laden()">
+📂 Daten laden
+</button>
+
+<button onclick="allesLoeschen()">
+🗑 Daten löschen
+</button>
+    
 <div id="ergebnis"></div>
 
 </div>
@@ -258,7 +270,80 @@ In 12 Monaten entspräche das:
 
 }
 
-neueAusgabe();
+}
+
+function speichern(){
+
+    localStorage.setItem(
+        "einkommen",
+        document.getElementById("einkommen").value
+    );
+
+    const ausgaben = [];
+
+    document.querySelectorAll(".zeile")
+    .forEach(zeile => {
+
+        ausgaben.push({
+            name: zeile.querySelector(".name").value,
+            betrag: zeile.querySelector(".betrag").value
+        });
+
+    });
+
+    localStorage.setItem(
+        "ausgaben",
+        JSON.stringify(ausgaben)
+    );
+
+    alert("Daten gespeichert");
+}
+
+function laden(){
+
+    document.getElementById("einkommen").value =
+        localStorage.getItem("einkommen") || "";
+
+    document.getElementById("ausgaben").innerHTML = "";
+
+    const ausgaben =
+        JSON.parse(
+            localStorage.getItem("ausgaben")
+        ) || [];
+
+    ausgaben.forEach(eintrag => {
+
+        neueAusgabe();
+
+        const zeilen =
+            document.querySelectorAll(".zeile");
+
+        const letzteZeile =
+            zeilen[zeilen.length - 1];
+
+        letzteZeile.querySelector(".name").value =
+            eintrag.name;
+
+        letzteZeile.querySelector(".betrag").value =
+            eintrag.betrag;
+
+    });
+
+}
+
+function allesLoeschen(){
+
+    localStorage.clear();
+
+    alert("Alle gespeicherten Daten wurden gelöscht");
+
+}
+
+laden();
+
+if(document.querySelectorAll(".zeile").length === 0){
+    neueAusgabe();
+}
 
 </script>
 
