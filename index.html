@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Klarblick Finanzen</title>
 
 <style>
@@ -12,7 +11,6 @@ body{
     margin:0;
     font-family:Arial,sans-serif;
     background:#f4f7fb;
-    color:#333;
 }
 
 .hero{
@@ -24,72 +22,54 @@ body{
 
 .hero h1{
     font-size:60px;
-    margin-bottom:20px;
-}
-
-.hero p{
-    font-size:24px;
-    max-width:900px;
-    margin:auto;
 }
 
 .container{
-    max-width:1100px;
+    max-width:1000px;
     margin:auto;
     padding:30px;
 }
 
 .card{
     background:white;
-    border-radius:20px;
     padding:30px;
-    margin-bottom:25px;
+    border-radius:20px;
+    margin-bottom:20px;
     box-shadow:0 4px 15px rgba(0,0,0,0.08);
 }
 
-h2{
-    color:#3767d8;
-}
-
-input, select{
+input{
     width:100%;
     padding:12px;
     border:1px solid #ccc;
     border-radius:10px;
-    margin-top:8px;
-}
-
-.kostenzeile{
-    display:grid;
-    grid-template-columns:2fr 2fr 1fr;
-    gap:10px;
-    margin-bottom:12px;
+    margin-bottom:10px;
 }
 
 button{
     background:#3767d8;
     color:white;
-    padding:12px 20px;
     border:none;
+    padding:12px 20px;
     border-radius:10px;
     cursor:pointer;
 }
 
 button:hover{
-    background:#2850b3;
+    background:#284fb3;
 }
 
 .ergebnis{
-    background:#e9f8ef;
+    background:#e8f7ef;
     padding:20px;
     border-radius:15px;
     margin-top:20px;
 }
 
-.betrag{
-    font-size:40px;
-    font-weight:bold;
+.gruen{
     color:#2ca36a;
+    font-size:42px;
+    font-weight:bold;
 }
 
 </style>
@@ -101,48 +81,27 @@ button:hover{
     <h1>Klarblick Finanzen</h1>
 
     <p>
-        Schulden sagen nichts über deinen Wert als Mensch aus.
-        Viele Menschen geraten durch Krankheit, Trennung,
-        Studium, Arbeitslosigkeit oder unerwartete Ereignisse
-        in finanzielle Schwierigkeiten.
+        Schulden können jeden treffen.
+        Du musst dich nicht schämen.
     </p>
 </section>
 
 <div class="container">
 
 <div class="card">
-
-<h2>Warum diese Website?</h2>
-
-<p>
-Der wichtigste Schritt ist nicht Perfektion.
-Der wichtigste Schritt ist Überblick.
-Wenn du deine Einnahmen und Ausgaben kennst,
-kannst du bessere Entscheidungen treffen.
-</p>
-
-</div>
-
-<div class="card">
-
 <h2>Monatliches Einkommen</h2>
-
-<input
-type="number"
-id="einkommen"
-placeholder="z.B. 2400">
-
+<input type="number" id="einkommen" placeholder="2400">
 </div>
 
 <div class="card">
 
 <h2>Regelmäßige Ausgaben</h2>
 
-<div id="fixkosten"></div>
-
-<button onclick="fixkostenHinzufuegen()">
-+ Ausgabe hinzufügen
-</button>
+<input type="number" class="fix" placeholder="Miete">
+<input type="number" class="fix" placeholder="Handy">
+<input type="number" class="fix" placeholder="Kredit">
+<input type="number" class="fix" placeholder="Netflix">
+<input type="number" class="fix" placeholder="Sonstige Kosten">
 
 </div>
 
@@ -150,11 +109,9 @@ placeholder="z.B. 2400">
 
 <h2>Alltägliche Ausgaben</h2>
 
-<div id="variablekosten"></div>
-
-<button onclick="variableHinzufuegen()">
-+ Ausgabe hinzufügen
-</button>
+<input type="number" class="variabel" placeholder="Lebensmittel">
+<input type="number" class="variabel" placeholder="Tanken">
+<input type="number" class="variabel" placeholder="Freizeit">
 
 </div>
 
@@ -172,129 +129,57 @@ Budget berechnen
 
 <script>
 
-const fixOptionen = [
-"Miete",
-"Strom",
-"Internet",
-"Handy",
-"Netflix",
-"Spotify",
-"Disney+",
-"Kredit",
-"Autofinanzierung",
-"Versicherung",
-"Fitnessstudio",
-"Unterhalt",
-"Sonstiges"
-];
-
-const variableOptionen = [
-"Lebensmittel",
-"Tanken",
-"Freizeit",
-"Restaurant",
-"Kleidung",
-"Medikamente",
-"Haustier",
-"Shopping",
-"Sonstiges"
-];
-
-function neueZeile(optionen){
-
-const div = document.createElement("div");
-div.className = "kostenzeile";
-
-const select = document.createElement("select");
-
-optionen.forEach(text => {
-const option = document.createElement("option");
-option.textContent = text;
-select.appendChild(option);
-});
-
-const name = document.createElement("input");
-name.placeholder = "Eigene Bezeichnung";
-
-const betrag = document.createElement("input");
-betrag.type = "number";
-betrag.placeholder = "€";
-
-div.appendChild(select);
-div.appendChild(name);
-div.appendChild(betrag);
-
-return div;
-
-}
-
-function fixkostenHinzufuegen(){
-document
-.getElementById("fixkosten")
-.appendChild(neueZeile(fixOptionen));
-}
-
-function variableHinzufuegen(){
-document
-.getElementById("variablekosten")
-.appendChild(neueZeile(variableOptionen));
-}
-
-function summe(containerId){
-
-let gesamt = 0;
-
-document
-.querySelectorAll("#" + containerId + " input[type='number']")
-.forEach(feld => {
-gesamt += Number(feld.value) || 0;
-});
-
-return gesamt;
-}
-
 function berechnen(){
 
-const einkommen =
-Number(document.getElementById("einkommen").value) || 0;
+let einkommen =
+parseFloat(
+document.getElementById("einkommen").value
+) || 0;
 
-const fix =
-summe("fixkosten");
+let fixkosten = 0;
 
-const variabel =
-summe("variablekosten");
+document.querySelectorAll(".fix")
+.forEach(function(feld){
 
-const frei =
-einkommen - fix - variabel;
+fixkosten += parseFloat(feld.value) || 0;
+
+});
+
+let variable = 0;
+
+document.querySelectorAll(".variabel")
+.forEach(function(feld){
+
+variable += parseFloat(feld.value) || 0;
+
+});
+
+let verfuegbar =
+einkommen - fixkosten - variable;
 
 document.getElementById("ergebnis").innerHTML = `
 
 <div class="ergebnis">
 
-<h3>Deine Übersicht</h3>
+<h2>Deine Übersicht</h2>
 
 <p><strong>Einkommen:</strong> ${einkommen.toFixed(2)} €</p>
 
-<p><strong>Regelmäßige Ausgaben:</strong> ${fix.toFixed(2)} €</p>
+<p><strong>Regelmäßige Ausgaben:</strong> ${fixkosten.toFixed(2)} €</p>
 
-<p><strong>Alltägliche Ausgaben:</strong> ${variabel.toFixed(2)} €</p>
+<p><strong>Alltägliche Ausgaben:</strong> ${variable.toFixed(2)} €</p>
 
 <hr>
 
 <p>Monatlich verfügbar:</p>
 
-<div class="betrag">
-${frei.toFixed(2)} €
+<div class="gruen">
+${verfuegbar.toFixed(2)} €
 </div>
 
 <p>
-Du hast den wichtigsten Schritt bereits geschafft:
+Du hast den wichtigsten Schritt geschafft:
 Du hast dir einen Überblick verschafft.
-</p>
-
-<p>
-Nach 12 Monaten entspräche das:
-<strong>${(frei * 12).toFixed(2)} €</strong>
 </p>
 
 </div>
@@ -302,9 +187,6 @@ Nach 12 Monaten entspräche das:
 `;
 
 }
-
-fixkostenHinzufuegen();
-variableHinzufuegen();
 
 </script>
 
