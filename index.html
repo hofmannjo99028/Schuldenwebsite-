@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Schuldenberatung</title>
+<title>Klarblick Finanzen</title>
 
 <style>
+
 body{
-    margin:0;
-    font-family:Arial,sans-serif;
+    font-family: Arial, sans-serif;
     background:#f5f9fc;
+    margin:0;
     color:#333;
 }
 
@@ -22,7 +22,7 @@ body{
 }
 
 .hero h1{
-    font-size:3rem;
+    font-size:50px;
 }
 
 .container{
@@ -35,6 +35,293 @@ body{
     background:white;
     padding:25px;
     border-radius:15px;
+    margin-bottom:25px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+h2{
+    color:#2d6cdf;
+}
+
+input, select{
+    width:100%;
+    padding:12px;
+    margin-top:5px;
+    margin-bottom:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button{
+    background:#2d6cdf;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d53b5;
+}
+
+.kostenzeile{
+    display:grid;
+    grid-template-columns:2fr 2fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.ergebnis{
+    background:#eaf8ef;
+    padding:20px;
+    border-radius:12px;
+    margin-top:20px;
+}
+
+.gruen{
+    color:#2ca36a;
+    font-size:38px;
+    font-weight:bold;
+}
+
+.rot{
+    color:#d9534f;
+    font-size:38px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+<h1>Klarblick Finanzen</h1>
+
+<p>
+Schulden können jeden treffen.
+Du musst dich nicht schämen.
+Der erste Schritt ist nicht Perfektion – sondern Überblick.
+</p>
+</section>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Monatliches Einkommen</h2>
+
+<input type="number" id="einkommen" placeholder="z.B. 2400">
+
+</div>
+
+<div class="card">
+
+<h2>Fixkosten</h2>
+
+<div id="fixkosten"></div>
+
+<button onclick="fixkostenHinzufuegen()">
++ Fixkosten hinzufügen
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Variable Kosten</h2>
+
+<div id="variablekosten"></div>
+
+<button onclick="variableKostenHinzufuegen()">
++ Variable Kosten hinzufügen
+</button>
+
+</div>
+
+<div class="card">
+
+<button onclick="berechnen()">
+Budget berechnen
+</button>
+
+<div id="ergebnis"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const fixOptionen = [
+"Miete",
+"Strom",
+"Gas",
+"Internet",
+"Handy",
+"Netflix",
+"Disney+",
+"Spotify",
+"Kredit",
+"Autofinanzierung",
+"Haftpflichtversicherung",
+"Hausratversicherung",
+"Krankenversicherung",
+"Fitnessstudio",
+"GEZ",
+"Sonstiges"
+];
+
+const variableOptionen = [
+"Lebensmittel",
+"Tanken",
+"ÖPNV",
+"Freizeit",
+"Restaurant",
+"Kleidung",
+"Medikamente",
+"Haustier",
+"Shopping",
+"Sonstiges"
+];
+
+function erstelleZeile(optionen){
+
+let div = document.createElement("div");
+div.className = "kostenzeile";
+
+let select = document.createElement("select");
+
+optionen.forEach(opt=>{
+let option = document.createElement("option");
+option.value = opt;
+option.textContent = opt;
+select.appendChild(option);
+});
+
+let name = document.createElement("input");
+name.placeholder = "Eigene Bezeichnung";
+
+let betrag = document.createElement("input");
+betrag.type = "number";
+betrag.placeholder = "€";
+
+div.appendChild(select);
+div.appendChild(name);
+div.appendChild(betrag);
+
+return div;
+}
+
+function fixkostenHinzufuegen(){
+document.getElementById("fixkosten")
+.appendChild(
+erstelleZeile(fixOptionen)
+);
+}
+
+function variableKostenHinzufuegen(){
+document.getElementById("variablekosten")
+.appendChild(
+erstelleZeile(variableOptionen)
+);
+}
+
+function summeBerechnen(containerId){
+
+let summe = 0;
+
+let container =
+document.getElementById(containerId);
+
+let zahlen =
+container.querySelectorAll('input[type="number"]');
+
+zahlen.forEach(feld=>{
+summe += Number(feld.value) || 0;
+});
+
+return summe;
+}
+
+function berechnen(){
+
+let einkommen =
+Number(
+document.getElementById("einkommen").value
+) || 0;
+
+let fixkosten =
+summeBerechnen("fixkosten");
+
+let variableKosten =
+summeBerechnen("variablekosten");
+
+let verfuegbar =
+einkommen - fixkosten - variableKosten;
+
+let html = `
+<div class="ergebnis">
+
+<h2>Deine Monatsübersicht</h2>
+
+<p><strong>Einkommen:</strong> ${einkommen.toFixed(2)} €</p>
+
+<p><strong>Fixkosten:</strong> ${fixkosten.toFixed(2)} €</p>
+
+<p><strong>Variable Kosten:</strong> ${variableKosten.toFixed(2)} €</p>
+`;
+
+if(verfuegbar >= 0){
+
+html += `
+<p>Du hast bereits den wichtigsten Schritt geschafft:
+Du kennst deine Zahlen.</p>
+
+<p>Monatlich verfügbar:</p>
+
+<div class="gruen">
+${verfuegbar.toFixed(2)} €
+</div>
+
+<p>
+Dieses Geld könntest du für Rücklagen,
+Notfälle oder Schuldenabbau nutzen.
+</p>
+
+<p>
+Nach 12 Monaten wären das:
+<strong>${(verfuegbar*12).toFixed(2)} €</strong>
+</p>
+`;
+
+}else{
+
+html += `
+<p>
+Aktuell liegen deine Ausgaben über deinem Einkommen.
+Das ist keine Niederlage – genau dafür dient diese Übersicht.
+</p>
+
+<div class="rot">
+${verfuegbar.toFixed(2)} €
+</div>
+`;
+}
+
+html += "</div>";
+
+document.getElementById("ergebnis").innerHTML =
+html;
+}
+
+fixkostenHinzufuegen();
+variableKostenHinzufuegen();
+
+</script>
+
+</body>
+</html>    border-radius:15px;
     box-shadow:0 4px 15px rgba(0,0,0,0.08);
     margin-bottom:25px;
 }
